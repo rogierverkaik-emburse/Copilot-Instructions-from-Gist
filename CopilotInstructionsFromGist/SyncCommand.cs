@@ -42,10 +42,12 @@ internal sealed class SyncCommand
 
     public static async Task InitializeAsync(AsyncPackage package)
     {
-        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-        Instance = new SyncCommand(package, commandService);
+        if (await package.GetServiceAsync(typeof(IMenuCommandService)) is OleMenuCommandService commandService)
+        {
+            _ = new SyncCommand(package, commandService);
+        }
     }
 
     private async void Execute(object sender, EventArgs e)
